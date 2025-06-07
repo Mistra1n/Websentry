@@ -21,9 +21,6 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 
-# Install tools
-chmod +x setup.sh
-./setup.sh
 
 Usage
 
@@ -38,3 +35,8 @@ python3 scripts/websentry.py xss-scan example.com/login
 
 # WAF testing
 python3 scripts/waf_breaker.py https://example.com
+
+
+# Install tools
+if any error just install the error pakage or contact me 2547264268**
+tool not complete or it is madify to your option
