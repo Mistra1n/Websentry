@@ -3,7 +3,7 @@
 **Advanced Web Vulnerability Scanner with WAF Bypass Capabilities**
 
 ![Alt text](https://raw.githubusercontent.com/Mistra1n/Websentry/refs/heads/main/templates/Screenshot_2025-06-06_22_12_56.png)
-[![Watch the video](https://youtu.be/vt5fpE0bzSY](https://github.com/Mistra1n/Websentry/blob/main/templates/new-2025-06-07_15.03.00.mkv)
+![Watch the video](https://github.com/Mistra1n/Websentry/blob/main/templates/new-2025-06-07_15.03.00.mkv)
 ## Features
 
 - 🌐 Full website reconnaissance
@@ -15,7 +15,7 @@
 ## Installation
 
 ```bash
-git clone --recurse-submodules https://github.com/Mistra1n/Websentry.git
+git clone https://github.com/Mistra1n/Websentry.git
 cd WebSentry
 python3 -m venv venv
 source venv/bin/activate
