@@ -1,0 +1,4 @@
+{
+  "slack_webhook": "https://hooks.slack.com/...",
+  "discord_webhook": "https://discord.com/api/webhooks/..."
+}

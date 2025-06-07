@@ -1,0 +1,8 @@
+X-Forwarded-For: 127.0.0.1
+CF-Connecting-IP: 127.0.0.1
+X-Real-IP: 127.0.0.1
+Host: localhost
+CF-IPCountry: US
+CF-Ray: 1234567890abcdef
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive

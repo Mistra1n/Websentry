@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Scan Report for {{ data.domain }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .vuln { background-color: #ffe6e6; padding: 10px; margin: 10px 0; border-left: 3px solid #ff3333; }
+        .info { background-color: #e6f3ff; padding: 10px; margin: 10px 0; border-left: 3px solid #3385ff; }
+        h1 { color: #333; }
+        h2 { color: #444; margin-top: 30px; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>WebSentry Scan Report</h1>
+    <p><strong>Target:</strong> {{ data.domain }}</p>
+    <p><strong>Scan Date:</strong> {{ data.date }}</p>
+
+    {% if data.nuclei %}
+    <h2>Vulnerabilities Found</h2>
+    {% for category, findings in data.nuclei.items() %}
+        {% if findings %}
+        <div class="vuln">
+            <h3>{{ category|upper }}</h3>
+            <ul>
+                {% for finding in findings %}
+                <li>{{ finding }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    {% endfor %}
+    {% endif %}
+
+    {% if data.dirsearch %}
+    <h2>Directory Brute-Force Results</h2>
+    <div class="info">
+        <ul>
+            {% for dir in data.dirsearch %}
+            <li>{{ dir }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    {% if data.sqlmap %}
+    <h2>SQL Injection Tests</h2>
+    <div class="info">
+        <pre>{{ data.sqlmap }}</pre>
+    </div>
+    {% endif %}
+</body>
+</html>
