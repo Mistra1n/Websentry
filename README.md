@@ -15,7 +15,7 @@
 ## Installation
 
 ```bash
-git clone --recurse-submodules https://github.com/yourusername/WebSentry.git
+git clone --recurse-submodules https://github.com/Mistra1n/Websentry.git
 cd WebSentry
 python3 -m venv venv
 source venv/bin/activate
