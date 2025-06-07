@@ -63,6 +63,27 @@ def send_notification(scan_results, config_file="config/notifications.json"):
             )
         except Exception as e:
             print(f"[!] Discord notification failed: {str(e)}")
+def handle_cloudflare(urls_file):
+    """Check for and bypass Cloudflare protection"""
+    from urllib.parse import urlparse
+    from cloudflare_bypass import CloudflareBypass
+    
+    with open(urls_file) as f:
+        urls = [line.strip() for line in f if line.strip()]
+    
+    bypassed_urls = []
+    for url in urls:
+        domain = urlparse(url).netloc
+        bypass = CloudflareBypass(domain)
+        bypass_url = bypass.test_bypass(url)
+        if bypass_url:
+            bypassed_urls.append(bypass_url)
+    
+    if bypassed_urls:
+        with open(urls_file, 'w') as f:
+            f.write('\n'.join(bypassed_urls))
+        print(f"  - Bypassed Cloudflare for {len(bypassed_urls)} URLs")
+        
 def generate_html_report(domain, scan_dir):
     """Generate professional HTML report"""
     clean_domain = sanitize_domain(domain)
@@ -288,19 +309,28 @@ def run_nuclei(domain, urls_file):
         print("    Run: nuclei -update-templates")
 
 def run_dirsearch(domain):
-    """Run directory brute-forcing with Python fallback"""
-    print("\n[+] Running directory brute-force")
+    """Modern directory brute-forcing with ffuf fallback to dirsearch"""
     clean_domain = sanitize_domain(domain)
     target_dir = SCAN_DIR / "targets" / clean_domain
     output_file = target_dir / "dirsearch" / "results.txt"
     
-    # Install dirsearch dependencies
-    try:
-        subprocess.run(["pip", "install", "defusedxml"], check=True)
-    except:
-        print("  - Could not install dirsearch dependencies")
+    # Use ffuf if available
+    if Path("/usr/bin/ffuf").exists():
+        try:
+            cmd = [
+                "ffuf",
+                "-u", f"https://{clean_domain}/FUZZ",
+                "-w", "/usr/share/wordlists/dirb/common.txt",
+                "-o", str(output_file),
+                "-of", "json"
+            ]
+            subprocess.run(cmd, check=True)
+            print("  - Directory brute-forcing completed with ffuf")
+            return
+        except Exception as e:
+            print(f"[!] ffuf failed: {str(e)}")
     
-    # Try native dirsearch first
+    # Try native dirsearch
     if TOOLS['dirsearch'].exists():
         try:
             cmd = [
@@ -309,7 +339,7 @@ def run_dirsearch(domain):
                 "-u", f"https://{clean_domain}",
                 "-e", "php,asp,aspx,jsp,html,js",
                 "-t", "20",
-                "--plain-text-report", str(output_file)  # Changed from --simple-report
+                "-o", str(output_file)
             ]
             subprocess.run(cmd, check=True)
             if output_file.exists():
@@ -336,7 +366,31 @@ def run_dirsearch(domain):
         f.write('\n'.join(found))
     
     print(f"  - Found {len(found)} common directories")
-
+    
+def run_dirsearch(domain):
+    """Modern directory brute-forcing with ffuf"""
+    clean_domain = sanitize_domain(domain)
+    output_file = SCAN_DIR / "targets" / clean_domain / "dirsearch" / "results.txt"
+    
+    # Use ffuf if available
+    if Path("/usr/bin/ffuf").exists():
+        try:
+            cmd = [
+                "ffuf",
+                "-u", f"https://{clean_domain}/FUZZ",
+                "-w", "/usr/share/wordlists/dirb/common.txt",
+                "-o", str(output_file),
+                "-of", "json"
+            ]
+            subprocess.run(cmd, check=True)
+            print("  - Directory brute-forcing completed with ffuf")
+            return
+        except Exception as e:
+            print(f"[!] ffuf failed: {str(e)}")
+    
+    # Fallback to existing implementation
+    print("  - Using basic directory check")
+    
 def run_sqlmap(domain):
     """Run SQLmap scan with basic check fallback"""
     print("\n[+] Testing for SQL injection")
@@ -393,13 +447,21 @@ def full_scan(domain):
         with open(live_file, 'w') as f:
             f.write(f"https://{clean_domain}")
     
-    run_nuclei(clean_domain, live_file)
+    # Add Cloudflare bypass
+    handle_cloudflare(live_file)
+    
+    # Run scans
+    run_nuclei(clean_domain, live_file)  # Only one call now
     run_dirsearch(clean_domain)
     run_sqlmap(clean_domain)
     
+    # Generate report
+    report_file = generate_html_report(clean_domain, SCAN_DIR)
+    
     print("\n[+] Scan completed!")
     print(f"    Results saved in: {target_dir}")
-
+    print(f"    Report generated: {report_file}")
+    
 def main():
     parser = argparse.ArgumentParser(description='Advanced Web Vulnerability Scanner')
     subparsers = parser.add_subparsers(dest='command', required=True)
