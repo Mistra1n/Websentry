@@ -1,0 +1,1 @@
+https://crackme.cenzic.com/search?q=test (GET)  # /home/mistra1n/Desktop/SecurityScans/tools/sqlmap/sqlmap.py -u https://crackme.cenzic.com/search?q=test --batch --crawl=1 --output-dir=/home/mistra1n/Desktop/SecurityScans/targets/crackme.cenzic.com/sqlmap
