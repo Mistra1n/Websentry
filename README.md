@@ -2,7 +2,7 @@
 
 **Advanced Web Vulnerability Scanner with WAF Bypass Capabilities**
 
-![WebSentry Logo](https://i.imgur.com/JQ9w8Bp.png) *(placeholder image)*
+![Alt text](https://raw.githubusercontent.com/Mistra1n/Websentry/refs/heads/main/templates/Screenshot_2025-06-06_22_12_56.png)
 
 ## Features
 
