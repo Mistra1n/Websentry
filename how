@@ -15,3 +15,22 @@ bash
 
 # Test the suspicious endpoint
 sqlmap -u "https://brokencrystals.com/api/testimonials/count?query=1" --batch
+
+
+Let's examine the websentry.py script to understand how it detects and uses these external tools.
+
+scripts\websentry.py :( 1 - 200 )
+
+Let's check if the Go tools are actually in the correct location by examining the Go bin directory.
+
+Websentry Terminal
+
+dir %USERPROFILE%\go\bin
+
+Let's try checking the Go bin directory with explicit user path.
+
+Websentry Terminal
+
+dir C:\Users\Mistra1n\go\bin
+
+Let's check the websentry.py script's tool path configuration since the Go tools are installed but in a different location than expected.
