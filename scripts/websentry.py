@@ -130,13 +130,13 @@ def generate_html_report(domain, scan_dir):
     print(f"\n[+] Generated HTML report: {report_file}")
     return report_file
 # Configuration
-SCAN_DIR = Path.home() / "Desktop" / "Websentry"
+SCAN_DIR = Path(__file__).resolve().parent.parent
 TOOLS = {
     'sqlmap': SCAN_DIR / "tools" / "sqlmap" / "sqlmap.py",
     'dirsearch': SCAN_DIR / "tools" / "dirsearch" / "dirsearch.py",
-    'nuclei': Path("/usr/bin/nuclei"),
-    'httpx': Path("/usr/local/bin/httpx"),
-    'waybackurls': Path("/usr/local/bin/waybackurls")
+    'nuclei': Path.home() / "go" / "bin" / "nuclei.exe",
+    'httpx': Path.home() / "go" / "bin" / "httpx.exe",
+    'waybackurls': Path.home() / "go" / "bin" / "waybackurls.exe"
 }
 
 def sanitize_domain(domain):
@@ -237,7 +237,11 @@ def run_httpx(urls_file):
         if not TOOLS['httpx'].exists():
             return basic_http_check(urls, output_file)
             
-        cmd = f"cat {urls_file} | {TOOLS['httpx']} -silent -status-code -title -tech-detect -o {output_file}"
+        # Use type command on Windows instead of cat
+        if os.name == 'nt':
+            cmd = f"type {urls_file} | {TOOLS['httpx']} -silent -status-code -title -tech-detect -o {output_file}"
+        else:
+            cmd = f"cat {urls_file} | {TOOLS['httpx']} -silent -status-code -title -tech-detect -o {output_file}"
         subprocess.run(cmd, shell=True, check=True)
         
         with open(output_file) as f:
