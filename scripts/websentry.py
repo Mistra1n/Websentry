@@ -136,7 +136,8 @@ TOOLS = {
     'dirsearch': SCAN_DIR / "tools" / "dirsearch" / "dirsearch.py",
     'nuclei': Path.home() / "go" / "bin" / "nuclei.exe",
     'httpx': Path.home() / "go" / "bin" / "httpx.exe",
-    'waybackurls': Path.home() / "go" / "bin" / "waybackurls.exe"
+    'waybackurls': Path.home() / "go" / "bin" / "waybackurls.exe",
+    'dalfox': Path.home() / "go" / "bin" / "dalfox.exe"
 }
 
 def sanitize_domain(domain):
@@ -168,6 +169,7 @@ def check_tools():
         print("  - sqlmap: git clone https://github.com/sqlmapproject/sqlmap.git tools/sqlmap")
         print("  - dirsearch: git clone https://github.com/maurosoria/dirsearch.git tools/dirsearch")
         print("  - waybackurls/httpx/nuclei: go install github.com/projectdiscovery/[tool]@latest")
+        print("  - dalfox: go install github.com/hahwul/dalfox/v2@latest")
         return False
     
     # Verify nuclei templates
@@ -459,6 +461,13 @@ def full_scan(domain):
     run_dirsearch(clean_domain)
     run_sqlmap(clean_domain)
     
+    # Run XSS scans
+    print("\n[*] Running XSS scans...")
+    with open(live_file) as f:
+        urls = [line.strip() for line in f if line.strip()]
+    for url in urls[:10]:  # Limit to first 10 URLs to avoid long scan times
+        run_dalfox(url)
+    
     # Generate report
     report_file = generate_html_report(clean_domain, SCAN_DIR)
     
@@ -466,17 +475,71 @@ def full_scan(domain):
     print(f"    Results saved in: {target_dir}")
     print(f"    Report generated: {report_file}")
     
+def run_dalfox(url):
+    """Run dalfox XSS scanner on target URL"""
+    if TOOLS['dalfox'].exists():
+        try:
+            cmd = [
+                str(TOOLS['dalfox']),
+                'url',
+                url,
+                '--silence',
+                '--format', 'json'
+            ]
+            process = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            
+            # Parse and handle results
+            if process.stdout:
+                try:
+                    results = json.loads(process.stdout)
+                    if results:
+                        print("  - XSS vulnerabilities found!")
+                        return results
+                except json.JSONDecodeError:
+                    pass
+            print("  - No XSS vulnerabilities found")
+        except Exception as e:
+            print(f"[!] Dalfox scan failed: {str(e)}")
+    else:
+        print("  - Dalfox not available, skipping")
+    return None
+
+def run_xss_scan(url):
+    """Run XSS vulnerability scan using both dalfox and custom tester"""
+    print(f"\n[+] Starting XSS scan for {url}")
+    
+    # Run dalfox scan
+    dalfox_results = run_dalfox(url)
+    
+    # Run custom XSS tester
+    from xss_tester import run_xss_scan as custom_xss_scan
+    custom_xss_scan(url)
+
 def main():
     parser = argparse.ArgumentParser(description='Advanced Web Vulnerability Scanner')
     subparsers = parser.add_subparsers(dest='command', required=True)
     
-    scan_parser = subparsers.add_parser('scan', help='Run full scan on target')
+    # Regular scan command
+    scan_parser = subparsers.add_parser('scan', help='Run basic scan on target')
     scan_parser.add_argument('domain', help='Target domain to scan (with or without http://)')
+    
+    # Full scan command with WAF bypass option
+    full_scan_parser = subparsers.add_parser('full-scan', help='Run comprehensive scan with additional options')
+    full_scan_parser.add_argument('domain', help='Target domain to scan (with or without http://)')
+    full_scan_parser.add_argument('--waf-bypass', action='store_true', help='Enable WAF/Cloudflare bypass attempts')
+    
+    # XSS scan command
+    xss_scan_parser = subparsers.add_parser('xss-scan', help='Run targeted XSS vulnerability scan')
+    xss_scan_parser.add_argument('url', help='Target URL to scan for XSS vulnerabilities')
     
     args = parser.parse_args()
     
     if args.command == 'scan':
         full_scan(args.domain)
+    elif args.command == 'full-scan':
+        full_scan(args.domain)  # WAF bypass is already included in full_scan
+    elif args.command == 'xss-scan':
+        run_xss_scan(args.url)
 
 if __name__ == '__main__':
     main()
