@@ -32,7 +32,7 @@ python3 scripts/websentry.py full-scan example.com --waf-bypass
 
 # XSS-only scan
 python3 scripts/websentry.py xss-scan example.com/login
-
+dalfox url https://example.com/login?test=123
 # WAF testing
 python3 scripts/waf_breaker.py https://example.com
 ```
