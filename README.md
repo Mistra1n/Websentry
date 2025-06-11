@@ -36,9 +36,13 @@ dalfox url https://example.com/login?test=123
 # WAF testing
 python3 scripts/waf_breaker.py https://example.com
 ```
+```bash
+You can now use WebSentry with dalfox in three ways:
 
-## Let's try running the websentry script now that we're in the virtual environment with all dependencies installed.
-
+# 1. Regular scan: python scripts/websentry.py scan <domain>
+# 2. Full scan with XSS: python scripts/websentry.py full-scan <domain>
+# 3. Targeted XSS scan: python scripts/websentry.py xss-scan <url>
+```
 ```bash          
 command: python scripts/websentry.py scan example.com
 ```
