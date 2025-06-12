@@ -24,8 +24,8 @@ pip install -r requirements.txt
 
 Usage
 
-# Basic scan
-python3 scripts/websentry.py scan example.com
+# Basic sqlmap
+python "c:\Users\Mistra1n\Desktop\proje\Websentry\Websentry\tools\sqlmap\sqlmap.py" -u "https://example.com/search?q=1" --tamper=space2comment,randomcase --random-agent --level=5 --risk=3
 
 # Full scan with all tests
 python3 scripts/websentry.py full-scan example.com --waf-bypass
