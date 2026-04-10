@@ -168,7 +168,10 @@ def check_tools():
         print("[!] Installation instructions:")
         print("  - sqlmap: git clone https://github.com/sqlmapproject/sqlmap.git tools/sqlmap")
         print("  - dirsearch: git clone https://github.com/maurosoria/dirsearch.git tools/dirsearch")
-        print("  - waybackurls/httpx/nuclei: go install github.com/projectdiscovery/[tool]@latest")
+        print("  - waybackurls: go install github.com/tomnomnom/waybackurls@latest")
+        print("  - httpx: go install github.com/projectdiscovery/httpx/cmd/httpx@latest")
+        print("  - nuclei: go install github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest")
+        print("  - dalfox: go install github.com/hahwul/dalfox/v2@latest")
         print("  - dalfox: go install github.com/hahwul/dalfox/v2@latest")
         return False
     
